@@ -1,10 +1,7 @@
 import React from 'react';
 import Userstorage from './stores/UserStorage'
 import './App.css';
-import LoginFrom from './loginForm';
-import Main from './Main';
-import inputFields from './inputFields';
-import SubmitButton from './submitButton';
+import Home from './Home';
 import { BrowserRouter } from 'react-router-dom';
 import {observer} from 'mobx-react'
 
@@ -73,7 +70,7 @@ class App extends React.Component {
               
               {/* <LoginFrom></LoginFrom> */}
             {/* </div>  */}
-            <Main/>
+            <Home/>
           </div>
           </BrowserRouter>
       );

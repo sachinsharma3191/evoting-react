@@ -1,5 +1,19 @@
 const bcrypt = require('bcrypt');
+const fs = require("fs");
 const nodemailer = require('nodemailer');
+const _ = require("underscore");
+const contract = require("./Contract").contract;
+const accounts = require("./Contract").accounts;
+const Web3 = require('web3');
+
+const imageDir = "./Images/";
+
+
+const transConfig = {
+    from: accounts,
+    gasPrice: Web3.utils.asciiToHex("0.001"),
+    gas: 6721975,
+};
 
 var otp;
 const high = 999999;
@@ -11,6 +25,10 @@ class Router {
         this.isLoggedIn(app,db);
         this.otpPost(app,db);
         this.registerPost(app,db);
+        this.getCandidates(app, db);
+        this.getCandidateImage(app, db);
+        this.castVote(app, db);
+        this.getElectionResult(app, db);
     }
 
     registerPost(app,db)
@@ -233,6 +251,128 @@ class Router {
                     });
                 }
             });
+        });
+    }
+
+    getCandidates(app, db) {
+        app.get("/candidate/all", (req, res) => {
+            console.log("Calling  Route");
+            db.query("select * from candidates;", (err, data, fields) => {
+                if (err) {
+                    res.status(500).json({
+                        success: false,
+                        msg: 'An error occured..'
+                    });
+                    return;
+                }
+                if (data) {
+                    res.json({
+                        success: true,
+                        msg: "Candidates Info Loaded",
+                        data: data
+                    });
+                }
+            });
+        });
+    }
+
+    getCandidateImage(app, db) {
+        app.get("/candidate/image/:name", (req, res) => {
+            console.log("Calling Image Api");
+            if (_.isEmpty(req.params.name)) {
+                res.status(500).json({
+                    success: false,
+                    msg: "Missing Candidate Name"
+                });
+            } else {
+                console.log("Downloading Image for " + req.params.name);
+                const fileName = imageDir + req.params.name + ".jpg";
+                fs.readFile(fileName, (err, items) => {
+                    if (err) {
+                        res.status(500).json({
+                            success: false,
+                            msg: err
+                        });
+                    } else {
+                        res.json({
+                            image: items,
+                            success: true,
+                            msg: "Candidates Image Loaded",
+                        });
+                    }
+                });
+            }
+
+
+        });
+    }
+
+    castVote(app, db) {
+        app.post("/vote", (req, res) => {
+            const candidate = req.body.candidate;
+            const voter = req.body.voter;
+            if (candidate < 0 || voter < 0) {
+                res.status(500).json({
+                    success: false,
+                    msg: "Missing or Invalid Candidate or Voter Info!!!Cannot vote"
+                });
+            } else {
+                contract.methods.vote(
+                    candidate, voter
+                ).send(transConfig).then((f) => {
+                    console.log(f);
+                    res.json({
+                        success: true,
+                        msg: "Voter " + voter + " successfully casted vote"
+                    })
+                }).catch(e => {
+                    console.log(e.message);
+                    res.status(500).json({
+                        success: false,
+                        msg: e.message
+                    });
+                });
+            }
+        });
+
+    }
+
+    getElectionResult(app, db) {
+        app.get("/result/:date", (req, res) => {
+            const date = new Date(req.params.date);
+            const resultDate = new Date("2020-04-06");
+            
+            if (date < resultDate) {
+                res.status(500).json({
+                    msg: "Election Results are not declared"
+                });
+            } else {
+                contract.methods.getElectionResult().
+                call(transConfig).then(result => {
+                    let elecResult = []
+                    for (let r of result) {
+                        let keys = Object.keys(r).filter(key => key === "candidate_id" || key === "first_name" || key === "last_name" || key === "voteCount");
+                        if(r[keys[0]]  !== "0"){
+                            elecResult.push({
+                                id: r[keys[0]],
+                                first_name: r[keys[1]],
+                                last_name: r[keys[2]],
+                                voteCount: r[keys[3]]
+                            });
+                        }
+                        
+                    }
+                    res.json({
+                        success: false,
+                        elecResult: elecResult
+                    });
+                }).catch(e => {
+                    res.status(500).json({
+                        success: false,
+                        msg: e.message
+                    });
+                })
+            }
         });
     }
 }
