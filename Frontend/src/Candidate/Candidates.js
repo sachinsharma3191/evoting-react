@@ -68,7 +68,7 @@ class Candidates extends Component {
         (candidate) => candidate.id === id
       );
       this.props.history.push({
-        pathname: "/candidateDetail",
+        pathname: "/CandidateDetail",
         state: { candidateDetails: candidate },
       });
     }

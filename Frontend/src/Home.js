@@ -29,9 +29,9 @@ class Home extends Component {
             <Route exact path="/welcome" component={Welcome} />
             <Route exact path="/verifyemail" component={VerifyEmail} />
             <Route exact path="/takeregisterphoto" component={TakeRegisterPhoto} />
-            <Route exact path="/election" component={Election}/>
-            <Route exact path="/result" thcomponent={Result}/>
-            <Route exact path="/candidateDetail" component={CandidateDetail}/>
+            <Route exact path="/Election" component={Election}/>
+            <Route exact path="/Result" thcomponent={Result}/>
+            <Route exact path="/CandidateDetail" component={CandidateDetail}/>
             </Switch>
           </div>
        
