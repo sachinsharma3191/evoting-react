@@ -296,7 +296,6 @@ class Router {
               });
             }
           }
-          console.log(candidates);
           res.json({
             success: true,
             msg: "Candidates Info Loaded",

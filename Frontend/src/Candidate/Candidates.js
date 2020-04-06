@@ -65,7 +65,6 @@ class Candidates extends Component {
   };
 
   showDetails = (id) => {
-    console.log(id);
     if (!_.isEmpty(id)) {
       const candidate = this.state.candidates.filter(
         (candidate) => candidate.id === id
@@ -125,7 +124,7 @@ class Candidates extends Component {
         <select style={style} onChange={this.handleCandidateChange}>
           <option>Select Candidate for Vote</option>
           {candidates.map((candidate) => (
-            <option value={candidate.id}>
+            <option key={candidate.id} value={candidate.id}>
               {candidate.first_name + " " + candidate.last_name}
             </option>
           ))}
@@ -135,7 +134,7 @@ class Candidates extends Component {
       button = (
         <div style={style}>
           <button className="btn btn primary" onClick={this.vote}>
-            Voter
+            Vote
           </button>
         </div>
       );

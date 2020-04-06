@@ -32,9 +32,8 @@ export const fetchCandidate =  () => {
             .catch((err) => {
               console.log(candidate);
             });
-
-           dispatch(fetchCandidateSuccess(candidates));
         }
+        dispatch(fetchCandidateSuccess(candidates));
       })
 
       .catch((error) => {
