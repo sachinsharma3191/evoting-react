@@ -30,7 +30,7 @@ class Home extends Component {
             <Route exact path="/verifyemail" component={VerifyEmail} />
             <Route exact path="/takeregisterphoto" component={TakeRegisterPhoto} />
             <Route exact path="/Election" component={Election}/>
-            <Route exact path="/Result" thcomponent={Result}/>
+            <Route exact path="/Result" component={Result}/>
             <Route exact path="/CandidateDetail" component={CandidateDetail}/>
             </Switch>
           </div>

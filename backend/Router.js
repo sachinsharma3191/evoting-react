@@ -341,7 +341,7 @@ class Router {
         app.get("/result/:date", (req, res) => {
             const date = new Date(req.params.date);
             const resultDate = new Date("2020-04-06");
-            
+            console.log("Loading Election Result");
             if (date < resultDate) {
                 res.status(500).json({
                     msg: "Election Results are not declared"
