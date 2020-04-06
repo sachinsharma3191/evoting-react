@@ -208,6 +208,7 @@ class Router {
     login(app,db)
     {
         app.post('/login', (req,res) => {
+            console.log(req.body[0]);
             let username = req.body.username;
             let password = req.body.password;
             username = username.toLowerCase();
@@ -302,8 +303,6 @@ class Router {
                     }
                 });
             }
-
-
         });
     }
 
@@ -340,9 +339,9 @@ class Router {
     getElectionResult(app, db) {
         app.get("/result/:date", (req, res) => {
             const date = new Date(req.params.date);
-            const resultDate = new Date("2020-04-06");
+            const resultDate = new Date("2020-04-10");
             console.log("Loading Election Result");
-            if (date < resultDate) {
+            if (date > resultDate) {
                 res.status(500).json({
                     msg: "Election Results are not declared"
                 });
