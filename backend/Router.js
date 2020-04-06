@@ -257,6 +257,20 @@ class Router {
 
     getCandidates(app, db) {
         app.get("/candidate/all", (req, res) => {
+            console.log(contract.methods);
+
+            contract.methods.getCandidates().
+            call(transConfig).
+            then(result => {
+                let elecResult = []
+                    for (let r of result) {
+                        //let keys = Object.keys(r).filter(key => key === "candidate_id" || key === "first_name" || key === "last_name" || key === "voteCount");
+                        console.log(Object.keys(r));
+                        
+                    }
+            }).catch(err => {
+                console.log(err)
+            })
             console.log("Calling  Route");
             db.query("select * from candidates;", (err, data, fields) => {
                 if (err) {

@@ -39,12 +39,10 @@ class ElectionResult extends Component {
   render() {
     const { result, error, loading } = this.state;
     let ui = null;
-    console.log(result);
-    console.log(error);
     if (loading) {
       ui = <Spinner />;
     }
-    if (result.length > 0) {
+    if (!loading && result.length > 0) {
       ui = result.map((cand) => {
         let id = cand.id;
         let voteCount = cand.voteCount;
@@ -53,19 +51,19 @@ class ElectionResult extends Component {
           <div key={id} className="row">
             <div className="col-md-6">
               <span>
-                <h1>{name}</h1>
+                <h2>{name}</h2>
               </span>
             </div>
             <div className="col-md-6">
               <span>
-                <h1>{voteCount}</h1>
+                <h4>{voteCount}</h4>
               </span>
             </div>
           </div>
         );
       });
     }
-    if (error) {
+    if (!loading  && error) {
       ui = (
         <span>
           <h2>{error}</h2>
@@ -75,10 +73,9 @@ class ElectionResult extends Component {
     return (
       <div className="container">
         <div className="row">
-        {ui}
-        <Footer/>
+        {ui}  
         </div>
-       
+      <Footer/>
       </div>
     );
   }

@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
 import _ from "underscore";
 import Spinner from "../UI/Spinner/Spinner";
 import Candidate from "./Candidate";
+import * as actions from '../redux/actions/index';
 
 const base64Flag = "data:image/jpeg;base64,";
 
@@ -21,6 +23,7 @@ class Candidates extends Component {
   }
 
   componentDidMount = async () => {
+    this.props.onFetchCandidates();
     axios
       .get("http://localhost:3002/candidate/all")
       .then((res) => {
@@ -32,6 +35,15 @@ class Candidates extends Component {
       });
   };
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (prevState.candidates !== nextProps.candidates) {
+      return {
+        candidates: nextProps.candidates
+      };
+    }
+    return null;
+  }
+
   arrayBufferToBase64 = (buffer) => {
     var binary = "";
     var bytes = [].slice.call(new Uint8Array(buffer));
@@ -39,28 +51,6 @@ class Candidates extends Component {
     return window.btoa(binary);
   };
 
-  getCandidateImage = async (candidate) => {
-    let first_name = candidate.split("_")[0];
-
-    let candidates = [...this.state.candidates];
-
-    let imageStr = null;
-
-    await axios
-      .get("http://localhost:3002/candidate/image/" + candidate)
-      .then((res) => {
-        imageStr = this.arrayBufferToBase64(res.data.image.data);
-      })
-      .catch((err) => {
-        console.log(err.response);
-      });
-    for (let candidate of candidates) {
-      if (candidate.first_name === first_name) {
-        candidate["image"] = base64Flag + imageStr;
-      }
-    }
-    this.setState({ candidates });
-  };
 
   showDetails = (id) => {
     if (_.isNumber(id)) {
@@ -73,6 +63,8 @@ class Candidates extends Component {
       });
     }
   };
+
+
 
   vote(id) {
 
@@ -87,10 +79,6 @@ class Candidates extends Component {
     }
     if (!_.isEmpty(candidates)) {
       ui = candidates.map((candidate) => {
-        if (_.isEmpty(candidate["image"])) {
-          const fullName = candidate.first_name + "_" + candidate.last_name;
-          this.getCandidateImage(fullName);
-        }
         return (
           <Candidate
             showDetails={this.showDetails}
@@ -104,4 +92,19 @@ class Candidates extends Component {
   }
 }
 
-export default withRouter(Candidates);
+const mapStateToProps = (state) => {
+  return {
+    loading: state.candidate.loading,
+    error: state.candidate.error,
+    candidates: state.candidate.candidates
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onFetchCandidates: () => dispatch(actions.fetchCandidate())
+  };
+};
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Candidates));
+
