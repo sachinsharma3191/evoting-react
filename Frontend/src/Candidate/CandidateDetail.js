@@ -21,7 +21,7 @@ const CandidateDetail = (props) => {
         <h2>
           <label htmlFor="long">Awards and Honours</label>
         </h2>
-        <div><span className="candidate">{candidate.candidate_work}</span></div>
+        <div><span className="candidate">{candidate.candidate_awards}</span></div>
       </div>
       <div className="Button">
         <button className="btn btn-primary" onClick={() => history.goBack()}>

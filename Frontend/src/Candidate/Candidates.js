@@ -5,9 +5,18 @@ import { withRouter } from "react-router-dom";
 import _ from "underscore";
 import Spinner from "../UI/Spinner/Spinner";
 import Candidate from "./Candidate";
-import * as actions from '../redux/actions/index';
+import * as actions from "../redux/actions/index";
 
 const base64Flag = "data:image/jpeg;base64,";
+
+const style = {
+  width: "30%",
+  marginLeft: "30%",
+  height: "50px",
+  marginTop: "40px",
+  marginBottom: "30px",
+  fontSize: "20px"
+};
 
 class Candidates extends Component {
   constructor(props) {
@@ -16,10 +25,14 @@ class Candidates extends Component {
     this.state = {
       candidates: [],
       error: null,
+      voter: 0,
+      candidate: 0,
       loading: true,
+      success: null,
     };
     this.showDetails = this.showDetails.bind(this);
     this.vote = this.vote.bind(this);
+    this.handleCandidateChange = this.handleCandidateChange.bind(this);
   }
 
   componentDidMount = async () => {
@@ -38,7 +51,7 @@ class Candidates extends Component {
   static getDerivedStateFromProps(nextProps, prevState) {
     if (prevState.candidates !== nextProps.candidates) {
       return {
-        candidates: nextProps.candidates
+        candidates: nextProps.candidates,
       };
     }
     return null;
@@ -51,9 +64,9 @@ class Candidates extends Component {
     return window.btoa(binary);
   };
 
-
   showDetails = (id) => {
-    if (_.isNumber(id)) {
+    console.log(id);
+    if (!_.isEmpty(id)) {
       const candidate = this.state.candidates.filter(
         (candidate) => candidate.id === id
       );
@@ -64,15 +77,35 @@ class Candidates extends Component {
     }
   };
 
+  handleCandidateChange(event) {
+    this.setState({ candidate: event.target.value });
+  }
 
-
-  vote(id) {
-
+  vote() {
+    if (this.state.candidate !== 0) {
+      let formData = {
+        voter: localStorage.getItem("userid"),
+        candidate: this.state.candidate,
+      };
+      axios
+        .post("http://localhost:3002/vote", formData)
+        .then((res) => {
+          console.log(res);
+          alert(res.data.msg);
+        })
+        .catch((err) => {
+          alert(err.response.data.msg);
+          this.setState({error : err.response.data.msg});
+        });
+    } else {
+      alert("Select Candidate");
+    }
   }
 
   render() {
     const { loading, candidates } = this.state;
-
+    let dropDown = null;
+    let button = null;
     let ui = null;
     if (loading && _.isEmpty(candidates)) {
       ui = <Spinner />;
@@ -87,8 +120,33 @@ class Candidates extends Component {
           />
         );
       });
+
+      dropDown = (
+        <select style={style} onChange={this.handleCandidateChange}>
+          <option>Select Candidate for Vote</option>
+          {candidates.map((candidate) => (
+            <option value={candidate.id}>
+              {candidate.first_name + " " + candidate.last_name}
+            </option>
+          ))}
+        </select>
+      );
+
+      button = (
+        <div style={style}>
+          <button className="btn btn primary" onClick={this.vote}>
+            Voter
+          </button>
+        </div>
+      );
     }
-    return <div className="row">{ui}</div>;
+    return (
+      <div className="row">
+        {dropDown}
+        {button}
+        {ui}
+      </div>
+    );
   }
 }
 
@@ -96,15 +154,16 @@ const mapStateToProps = (state) => {
   return {
     loading: state.candidate.loading,
     error: state.candidate.error,
-    candidates: state.candidate.candidates
+    candidates: state.candidate.candidates,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onFetchCandidates: () => dispatch(actions.fetchCandidate())
+    onFetchCandidates: () => dispatch(actions.fetchCandidate()),
   };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Candidates));
-
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(Candidates)
+);

@@ -62,7 +62,7 @@ export const auth = (email, password) => {
 
                 localStorage.setItem("token", "sadasdasasdasdasd");
                 localStorage.setItem("expirationDate", expirationDate);
-                localStorage.setItem("userId", responseData.username);
+                localStorage.setItem("userid", responseData.userid);
                 localStorage.setItem("username",responseData.username);
                 //Dispatch Actions
                 dispatch(authSuccess("asdassa", responseData.username));

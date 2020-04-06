@@ -4,7 +4,6 @@ import './Candidate.css';
 const Candidate = (props) => {
   const candidate = props.candidate;
   const full_name = candidate.first_name + " " + candidate.last_name;
-
   return (
     <div className="row">
       <div className="col-md-3">
